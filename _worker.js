@@ -1442,8 +1442,6 @@ async function handleMediaUpload(chatId, file, isDocument, config, userSetting) 
         fileName = `voice_message_${Date.now()}.${ext}`;
       } else if (file.audio) {
         fileName = (file.audio.title || `audio_${Date.now()}`) + `.${ext}`;
-      } else if (file.video) {
-        fileName = `video_${Date.now()}.${ext}`;
       } else {
         fileName = `file_${Date.now()}.${ext}`;
       }
@@ -2310,7 +2308,6 @@ function getContentType(ext) {
     tif: 'image/tiff',
     mp4: 'video/mp4',
     webm: 'video/webm',
-    ogg: 'video/ogg',
     ogv: 'video/ogg',
     avi: 'video/x-msvideo',
     mov: 'video/quicktime',
@@ -2321,7 +2318,7 @@ function getContentType(ext) {
     ts: 'video/mp2t',
     mp3: 'audio/mpeg',
     wav: 'audio/wav',
-    ogg: 'audio/ogg',
+    ogg: 'audio/ogg', // 保留这个，删除另一个重复项
     m4a: 'audio/mp4',
     aac: 'audio/aac',
     flac: 'audio/flac',
@@ -4110,9 +4107,9 @@ function generateAdminPage(fileCards, categoryOptions) {
           try {
             navigator.clipboard.writeText(url)
               .then(() => alert('链接已复制: ' + url))
-              .catch(() => prompt('请复制链接:', url));
+              .catch(() => prompt('请手动复制链接:', url));
           } catch (e) {
-            prompt('请复制链接:', url);
+            prompt('请手动复制链接:', url);
           }
         }
       }
@@ -4467,7 +4464,7 @@ function getExtensionFromMime(mimeType) {
     'image/x-icon': 'ico',
     'video/mp4': 'mp4',
     'video/webm': 'webm',
-    'video/ogg': 'ogv',
+    'video/ogg': 'ogv', // Keep video/ogg for .ogv extension
     'video/x-msvideo': 'avi',
     'video/quicktime': 'mov',
     'video/x-ms-wmv': 'wmv',
@@ -4477,7 +4474,7 @@ function getExtensionFromMime(mimeType) {
     'video/mp2t': 'ts',
     'audio/mpeg': 'mp3',
     'audio/mp3': 'mp3',
-    'audio/ogg': 'ogg',
+    'audio/ogg': 'ogg', // This is the one we keep for .ogg extension
     'audio/wav': 'wav',
     'audio/mp4': 'm4a',
     'audio/aac': 'aac',
@@ -4513,7 +4510,8 @@ function getExtensionFromMime(mimeType) {
     'application/octet-stream': 'bin',
     'application/x-shockwave-flash': 'swf'
   };
-  return mimeMap[mimeType] || 'bin';
+  const lowerExt = ext.toLowerCase();
+  return types[lowerExt] || 'application/octet-stream';
 }
 async function uploadToR2(arrayBuffer, fileName, mimeType, config) {
   try {
@@ -4636,4 +4634,3 @@ try {
 } catch (error) {
   console.error('添加DOMContentLoaded事件监听器失败:', error);
 }
-  
